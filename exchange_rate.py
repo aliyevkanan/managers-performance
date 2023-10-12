@@ -2,7 +2,6 @@ from flask import Flask, render_template, Response, request
 import datetime
 import requests
 import pandas as pd
-from user_agent import generate_user_agent
 
 
 app = Flask(__name__, template_folder="templates")
@@ -10,8 +9,7 @@ app = Flask(__name__, template_folder="templates")
 
 def get_data(update_from, update_to):
     url = f'https://bank.gov.ua/NBU_Exchange/exchange_site?start={update_from}&end={update_to}&valcode=usd&sort=exchangedate&order=desc&json'
-    headers = {'User-Agent': generate_user_agent()}
-    response = requests.get(url, headers=headers)
+    response = requests.get(url)
     return response.json()
 
 def proccess_data(response):
@@ -30,10 +28,9 @@ def index():
         response = get_data(update_from, update_to)
         df = proccess_data(response)
 
-        file_path = "csv_folder/" + "usd_uah.csv"
-        df.to_csv(file_path, index=True)
+        df.to_csv('usd_uah.csv', index=True)
 
-        return Response(f"File - {file_path} was Downloaded")
+        return Response(f"File - usd_uah was Downloaded")
     
     else:
         return render_template('index.html')
